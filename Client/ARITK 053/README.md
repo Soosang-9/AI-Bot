@@ -8,6 +8,7 @@ ARTIK053
       └ apps
           └ examples
               └ sensorbd_demo
+                  ├ sensorbd_main.c
                   └ examples
                       ├ socket.c
                       ├ recorder.c
