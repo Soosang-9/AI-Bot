@@ -3,15 +3,15 @@ Using ARTIK053
 
 ## File storage location
 ```
-ARTIK053 \
-  └ TizenRT \
-      └ apps \
-          └ examples \
-              └ sensorbd_demo \
-                  └ examples \
-                      ├ socket.c \
-                      ├ recorder.c \
-                      ├ player.c \
+ARTIK053
+  └ TizenRT
+      └ apps
+          └ examples
+              └ sensorbd_demo
+                  └ examples
+                      ├ socket.c
+                      ├ recorder.c
+                      ├ player.c
                       └ run_moppy.c
 ```
             
