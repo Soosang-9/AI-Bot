@@ -25,7 +25,7 @@ ADDR = (HOST, PORT)
 # ==================================================
 def audio_converter(input_audio):
     convert_audio = "output_tts.wav"
-    cmd_convert = "ffmpeg -i {} -acodec pcm_u8 -ar 44100 -ac 2 -y {}".format(input_audio, convert_audio)
+    cmd_convert = "ffmpeg -i {} -ar 44100 -ac 2 -y {}".format(input_audio, convert_audio)
     os.system(cmd_convert)
 
     return convert_audio
