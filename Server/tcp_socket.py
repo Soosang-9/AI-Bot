@@ -37,9 +37,9 @@ class SocketProcess(multiprocessing.Process):
         self.socket_process = None
 
     def run(self):
-        # ================================================
+        # --------------------------------
         # Make user socket class
-        # ================================================
+        # --------------------------------
         print('run >> >> >> >> >> >>')
         self.socket_process = Socket()
         self.socket_process.socket_action()
@@ -47,9 +47,9 @@ class SocketProcess(multiprocessing.Process):
 
 class Socket:
     def __init__(self):
-        # ================================================
+        # ----------------------------------------------------------------
         # Make server_socket and add reuse_address option.
-        # ================================================
+        # ----------------------------------------------------------------
         print('socket class >> >> >> >> >> >> ')
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -64,21 +64,21 @@ class Socket:
         #   1. write_debug
         #   2. write_warning
         #   3. write_critical
-        # --------------------------------------------------
+        # =============================================
         self.user_ip = ''
         self.user_port = ''
         # self.logger = aibril_logger.logger(self.user_ip + ".log")
         # self.logger.write_info("new_user: " + self.user_ip + ", " + self.user_port)
 
-        # ================================================
+        # --------------------------------
         #   weather city list
-        # ================================================
+        # --------------------------------
         self.cities = ['seoul', 'busan', 'jeju', 'daejeon', 'gwangju', 'daegu']
         self.weather = wp.weather_parsing()
 
-        # ================================================
+        # --------------------------------
         #   watson & aibril info
-        # ================================================
+        # --------------------------------
         self.watson_username = os.getenv('watson_username')
         self.watson_password = os.getenv('watson_password')
         self.watson_workspace = os.getenv('watson_workspace')
@@ -95,16 +95,33 @@ class Socket:
         self.language_translator = None
         self.aibril_lt_connect()
 
-    # ==================================================
+    @staticmethod
+    def send_message_format(message, data):
+        return message+', '+data
+
+    @staticmethod
+    def recv_message_format(sock_message):
+        try:
+            sock_message = sock_message.split(', ')
+        except Exception as e:
+            print('\n\t★recv_message can\'t split >> {}'.format(e))
+            sock_message = ['FE']
+            # FE: Format Error
+        if len(sock_message) > 2:
+            return ['FE']
+        else:
+            return sock_message
+
+    # --------------------------------
     #   parsing weather
-    # ==================================================
+    # --------------------------------
     def weather_parse(self, city):
         text = self.weather.get_weather_forecast(city)
         return text
 
-    # ==================================================
+    # --------------------------------
     #   aibril conversation server
-    # ==================================================
+    # --------------------------------
     def aibril_conv_connect(self):
         try:
             self.conversation = conversation_v1.ConversationV1(username=self.watson_username,
@@ -123,9 +140,9 @@ class Socket:
 
         print("connected to Aibril conversation server")
 
-    # ==================================================
+    # --------------------------------
     #   aibril conversation
-    # ==================================================
+    # --------------------------------
     def aibril_conv(self, text):
         if self.watson_conv_id == '':
              self.aibril_conv_connect()
@@ -203,9 +220,9 @@ class Socket:
 
         return result_conv
 
-    # ==================================================
+    # ----------------------------------------
     #   aibril language translator server
-    # ==================================================
+    # ----------------------------------------
     def aibril_lt_connect(self):
         try:
             self.language_translator = LanguageTranslatorV2(url='https://gateway.aibril-watson.kr/language-translator/api',
@@ -217,9 +234,9 @@ class Socket:
 
         print("connected to Aibril language translator server")
 
-    # ==================================================
+    # --------------------------------
     #   aibril language translator
-    # ==================================================
+    # --------------------------------
     def aibril_lt(self, trans_text, model_id):
         if self.aibril_lt_connect() == '':
             self.aibril_conv_connect()
@@ -233,6 +250,9 @@ class Socket:
         print(result_conv)
         return result_conv
 
+    # ===========================
+    #   Moppy select server Start
+    # ===========================
     def socket_action(self):
         print('socket_action >> >> >> >> >> >> >>')
 
@@ -243,9 +263,9 @@ class Socket:
                 print('\tread_socket >> {}\n\twrite_socket >> {}\n\terror_socket >> {}'.format(read_socket, write_socket, error_socket))
 
                 for sock in read_socket:
-                    # ================================================
+                    # ----------------------------------------------------
                     # If select find new client_socket connection
-                    # ================================================
+                    # ----------------------------------------------------
                     if sock == self.connection_list[0]:
                         client_socket, client_info = self.connection_list[0].accept()
                         self.connection_list.append(client_socket)
@@ -253,24 +273,39 @@ class Socket:
 
                     else:
                         print('\nclient_old_connect >> >> >> >> >> >> >> >> >> >> >>')
-                        # ================================================
+                        # ---------------------------------------------------
                         # If select fine old client_socket connection
-                        # ================================================
+                        # ---------------------------------------------------
                         message = sock.recv(BUFSIZE)
                         if message:
-                            print('\tclient_message >> {}'.format(message))
-                            print('\tclient_message_size >> {}'.format(len(message)))
-                            # ================================================
-                            # If client_socket send data
-                            # ================================================
+                            # print('\tclient_message >> {}'.format(message))
+                            # print('\tclient_message_size >> {}'.format(len(message)))
 
-                            if self.data_length > 1:
+                            socket_message = self.recv_message_format(message)
+                            print('\tsocket_message >> {}'.format(socket_message[0]))
+                            # --------------------------------
+                            # If client_socket send data
+                            # --------------------------------
+
+                            if socket_message[0] == 'DI':
+                                print('\tdevice Id >> {}'.format(socket_message[1]))
+
+                            if socket_message[0] == 'FS':
+                                print('\tclient_message - now it is data_length>> {}'.format(socket_message[1]))
+                                try:
+                                    self.data_length = int(socket_message[1])
+                                except Exception as e:
+                                    print('\n★ data casting error >> {}'.format(e))
+
+                            if socket_message[0] == 'FD':
                                 print('\tself.data_length >> {}'.format(self.data_length))
-                                temp_data = b''
-                                temp_data += message
+                                data = b''
+                                data += socket_message[1]
                                 while True if self.data_length != len(temp_data) else False:
                                     # print('{}'.format(True if self.data_length != len(temp_data) else False))
-                                    temp_data += sock.recv(BUFSIZE)
+                                    temp_data = self.recv_message_format(sock.recv(BUFSIZE))
+                                    if temp_data[0] == 'FD':
+                                        data += temp_data[1]
                                     # print('{}'.format(len(temp_data))),
 
                                 # print('\tend recv >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>')
@@ -283,24 +318,24 @@ class Socket:
                                 except Exception as e:
                                     print('\n\t★ file can\'t open >> {}'.format(e))
 
-                                # --------------------------------------------------
+                                # ------------------------------
                                 #   speech to text (google)
-                                # --------------------------------------------------
+                                # ------------------------------
                                 file_stt = file_name
                                 rec_stt = speech_module.SpeechToText().audio_stt(file_stt)
                                 if rec_stt == '나는 혼자 할래':  # test, remove later
                                     rec_stt = '나는 환자 할래'
                                 print("speech to text>", rec_stt)
 
-                                # --------------------------------------------------
+                                # --------------------------------------
                                 #   conversation (aibril, watson)
-                                # --------------------------------------------------
+                                # --------------------------------------
                                 result_conv = self.aibril_conv(rec_stt)
                                 print("conversation>", result_conv)
 
-                                # --------------------------------------------------
+                                # ----------------------------------------------
                                 #   check the translator is in the context
-                                # --------------------------------------------------
+                                # ----------------------------------------------
                                 result_trans = ""
                                 if (result_conv.split())[-1] == 'trans_en':
                                     trans_text = rec_stt
@@ -316,9 +351,9 @@ class Socket:
                                     result_trans = self.aibril_lt(trans_text, model_id)
                                 print("check translator>", result_trans)
 
-                                # --------------------------------------------------
+                                # -------------------------------
                                 #   text to speech (google)
-                                # --------------------------------------------------
+                                # -------------------------------
                                 if (result_conv.split())[-1] == 'trans_en':
                                     text_gtts = result_trans
                                     language = 'en'
@@ -344,14 +379,14 @@ class Socket:
                                     output_tts = "output_tts.mp3"
                                     rec_tts.save(output_tts)
 
-                                # --------------------------------------------------
+                                # --------------------
                                 #   convert audio
-                                # --------------------------------------------------
+                                # --------------------
                                 convert_audio = audio_converter(output_tts)
 
-                                # ================================================
+                                # --------------------------------
                                 #   sending tts-audio file
-                                # ================================================
+                                # --------------------------------
                                 self.count += 1
                                 server_data = None
                                 server_data_length = None
@@ -366,9 +401,9 @@ class Socket:
 
                                 try:
                                     print('\ntry to send file{}\n'.format(' >>'*21))
-                                    sock.send(str(server_data_length).encode())
+                                    sock.send(self.send_message_format('FS', str(server_data_length).encode()))
                                     print('\tsocket_send length >> {}'.format(server_data_length))
-                                    sock.send(server_data)
+                                    sock.send(self.send_message_format('FD', server_data))
                                     print('\tsocket_send data >> {}'.format(len(server_data)))
                                 except Exception as e:
                                     print('\n\t★ file can\'t send >> {}'.format(e))
@@ -376,17 +411,10 @@ class Socket:
                                 self.data_length = 0
                                 print('\nprogram send end{}\n'.format(' >>'*21))
 
-                            else:
-                                print('\tclient_message - now it is data_length>> {}'.format(message))
-                                try:
-                                    self.data_length = int(message)
-                                except Exception as e:
-                                    print('\n★ server recv error >> {}'.format(e))
-
                         else:
-                            # ================================================
+                            # ----------------------------------------------------------------
                             # If client_socket didn't send message or broken socket
-                            # ================================================
+                            # ----------------------------------------------------------------
                             print('\n\t★ client {} disconnected'.format(sock))
                             self.connection_list.remove(sock)
                             sock.close()
