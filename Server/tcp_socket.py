@@ -18,6 +18,7 @@ PORT = 7001
 BUFSIZE = 1024
 ADDR = (HOST, PORT)
 
+
 # ================ audio converter =================
 #   - mp3 to wav
 #   - sample rate(22050Hz to 44100Hz)
@@ -29,6 +30,7 @@ def audio_converter(input_audio):
     os.system(cmd_convert)
 
     return convert_audio
+
 
 class SocketProcess(multiprocessing.Process):
     def __init__(self):
@@ -97,16 +99,18 @@ class Socket:
 
     @staticmethod
     def send_message_format(message, data):
-        return message+', '+data
+        return (message+', '+data).encode()
 
     @staticmethod
     def recv_message_format(sock_message):
         try:
             # print('sock_message binary >> {}'.format(sock_message))
-            # print(type(str(sock_message)))
-            sock_message = (sock_message.decode()).split(', ')
+            print(type(sock_message))
+            if type(sock_message) != str:
+                sock_message = sock_message.decode()
+            sock_message = sock_message.split(', ')
         except Exception as e:
-            print('\n\t★recv_message can\'t split >> {}'.format(e))
+            print('\n\t★ recv_message can\'t split >> {}'.format(e))
             sock_message = ['FE']
             # FE: Format Error
         if len(sock_message) > 2:
@@ -257,12 +261,11 @@ class Socket:
     # ===========================
     def socket_action(self):
         print('socket_action >> >> >> >> >> >> >>')
-
+        print('\nwaiting client socket connection{}'.format(' >>' * 16))
         while self.connection_list:
             try:
-                print('\nwaiting client socket connection{}'.format(' >>'*16))
                 read_socket, write_socket, error_socket = select.select(self.connection_list, [], [], 5)
-                print('\tread_socket >> {}\n\twrite_socket >> {}\n\terror_socket >> {}'.format(read_socket, write_socket, error_socket))
+                # print('\tread_socket >> {}\n\twrite_socket >> {}\n\terror_socket >> {}'.format(read_socket, write_socket, error_socket))
 
                 for sock in read_socket:
                     # ----------------------------------------------------
@@ -280,7 +283,7 @@ class Socket:
                         # ---------------------------------------------------
                         message = sock.recv(BUFSIZE)
                         if message:
-                            print('\tclient_message >> {}'.format(message))
+                            # print('\tclient_message >> {}'.format(message))
                             # print('\tclient_message_size >> {}'.format(len(message)))
 
                             socket_message = self.recv_message_format(message)
@@ -291,23 +294,23 @@ class Socket:
 
                             if socket_message[0] == 'DI':
                                 print('\tdevice Id >> {}'.format(socket_message[1]))
+                                # sock.send('OK'.encode())
 
                             if socket_message[0] == 'FS':
                                 print('\tclient_message - now it is data_length>> {}'.format(socket_message[1]))
                                 try:
                                     self.data_length = int(socket_message[1])
+                                    # sock.send('OK'.encode())
                                 except Exception as e:
                                     print('\n★ data casting error >> {}'.format(e))
 
                             if socket_message[0] == 'FD':
                                 print('\tself.data_length >> {}'.format(self.data_length))
                                 data = b''
-                                data += socket_message[1]
-                                while True if self.data_length != len(temp_data) else False:
+                                while True if self.data_length != len(data) else False:
                                     # print('{}'.format(True if self.data_length != len(temp_data) else False))
-                                    temp_data = self.recv_message_format(sock.recv(BUFSIZE))
-                                    if temp_data[0] == 'FD':
-                                        data += temp_data[1]
+                                    data += sock.recv(BUFSIZE)
+                                    # sock.send('OK'.encode())
                                     # print('{}'.format(len(temp_data))),
 
                                 # print('\tend recv >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>')
@@ -316,7 +319,7 @@ class Socket:
                                 try:
                                     print('\ntry to make file{}\n'.format(' >>'*21))
                                     with open(file_name, 'wb') as test_file:
-                                        test_file.write(temp_data)
+                                        test_file.write(data)
                                 except Exception as e:
                                     print('\n\t★ file can\'t open >> {}'.format(e))
 
@@ -403,9 +406,10 @@ class Socket:
 
                                 try:
                                     print('\ntry to send file{}\n'.format(' >>'*21))
-                                    sock.send(self.send_message_format('FS', str(server_data_length).encode()))
+                                    sock.send(self.send_message_format('FS', str(server_data_length)))
                                     print('\tsocket_send length >> {}'.format(server_data_length))
-                                    sock.send(self.send_message_format('FD', server_data))
+                                    sock.send('FD'.encode())
+                                    sock.send(server_data)
                                     print('\tsocket_send data >> {}'.format(len(server_data)))
                                 except Exception as e:
                                     print('\n\t★ file can\'t send >> {}'.format(e))
