@@ -25,7 +25,7 @@ ADDR = (HOST, PORT)
 # ==================================================
 def audio_converter(input_audio):
     convert_audio = "output_tts.wav"
-    cmd_convert = "ffmpeg -i {} -acodec pcm_u8 -ar 44100 -ac 2 -y {}".format(input_audio, convert_audio)
+    cmd_convert = "ffmpeg -i {} -ar 44100 -ac 2 -y {}".format(input_audio, convert_audio)
     os.system(cmd_convert)
 
     return convert_audio
@@ -102,7 +102,9 @@ class Socket:
     @staticmethod
     def recv_message_format(sock_message):
         try:
-            sock_message = sock_message.split(', ')
+            # print('sock_message binary >> {}'.format(sock_message))
+            # print(type(str(sock_message)))
+            sock_message = (sock_message.decode()).split(', ')
         except Exception as e:
             print('\n\t★recv_message can\'t split >> {}'.format(e))
             sock_message = ['FE']
@@ -278,7 +280,7 @@ class Socket:
                         # ---------------------------------------------------
                         message = sock.recv(BUFSIZE)
                         if message:
-                            # print('\tclient_message >> {}'.format(message))
+                            print('\tclient_message >> {}'.format(message))
                             # print('\tclient_message_size >> {}'.format(len(message)))
 
                             socket_message = self.recv_message_format(message)
