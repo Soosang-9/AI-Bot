@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# master
+# master project
 
 import multiprocessing
 import socket
