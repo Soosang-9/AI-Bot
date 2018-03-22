@@ -21,6 +21,8 @@ class Aibril:
         self.watson_conv_id = ''
         self.conversation = None
 
+        print('check check >> {}'.format(WATSON_USERNAME))
+
         self.connection()
 
     def connection(self):

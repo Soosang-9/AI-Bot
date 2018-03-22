@@ -16,8 +16,8 @@ ADDR = (HOST, PORT)
 
 
 def audio_converter(input_audio):
-    convert_audio = "output_tts.wav"
-    cmd_convert = "ffmpeg -i {} -ar 44100 -ac 2 -y {}".format(input_audio, convert_audio)
+    convert_audio = input_audio + 'wav'
+    cmd_convert = "ffmpeg -i {} -ar 44100 -ac 2 -y {}".format(input_audio + 'mp3', convert_audio)
     os.system(cmd_convert)
 
     return convert_audio
@@ -73,9 +73,7 @@ class Socket:
                         client_socket, client_info = self.connection_list[0].accept()
                         aibril = aibril_module.Aibril()
                         self.connection_list.append(client_socket)
-                        print('\tconnection_size >> {}'.format(len(self.connection_list)))
                         self.aibril_list.append(aibril)
-                        print('\taibril_size >> {}'.format(len(self.aibril_list)))
                         print('\ttime {} >> new client {} connected'.format(time.ctime(), client_info))
 
                         if not os.path.exists('usr/'+client_info[0]):
@@ -84,15 +82,14 @@ class Socket:
 
                     else:
                         sock_index = self.connection_list.index(sock)-1
-                        print('connection_list index >> {}'.format(self.connection_list.index(sock)))
                         print('\nclient_old_connect >> >> >> >> >> >> >> >> >> >> >>')
                         # ================================================
                         # If select fine old client_socket connection
                         # ================================================
                         message = sock.recv(BUFSIZE)
                         if message:
-                            print('\tclient_message >> {}'.format(message))
-                            print('\tclient_message_size >> {}'.format(len(message)))
+                            # print('\tclient_message >> {}'.format(message))
+                            # print('\tclient_message_size >> {}'.format(len(message)))
                             # ================================================
                             # If client_socket send data
                             # ================================================
@@ -137,12 +134,13 @@ class Socket:
                                     #   text to speech (google)
                                     # --------------------------------------------------
                                     print('\ttext_gtts >> {}'.format(text_gtts))
-                                    self.google.tts(text_gtts, language, "output_tts.mp3")
+                                    file_name = 'usr/' + sock.getpeername()[0] + '/output_tts.'
+                                    self.google.tts(text_gtts, language, (file_name + 'mp3'))
 
                                     # --------------------------------------------------
                                     #   convert audio
                                     # --------------------------------------------------
-                                    convert_audio = audio_converter("output_tts.mp3")
+                                    convert_audio = audio_converter(file_name)
 
                                     self.count += 1
                                     server_data = None
@@ -167,12 +165,12 @@ class Socket:
                                     self.data_length = 0
                                     print('\nprogram send end >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
 
-                                else:
-                                    print('\tclient_message - now it is data_length>> {}'.format(message))
-                                    try:
-                                        self.data_length = int(message)
-                                    except Exception as e:
-                                        print('\n★ server recv error >> {}'.format(e))
+                            else:
+                                print('\tclient_message - now it is data_length>> {}'.format(message))
+                                try:
+                                    self.data_length = int(message)
+                                except Exception as e:
+                                    print('\n★ server recv error >> {}'.format(e))
 
                         else:
                             # ================================================
