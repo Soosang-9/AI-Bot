@@ -39,7 +39,8 @@ static void show_usage(FAR const char *program)
 	printf(" %s socket     : audio file send/recv\n", program);
 	printf(" %s recorder   : audio recorder\n", program);
 	printf(" %s player     : audio player & file send/recv\n", program);
-	printf(" %s run_moppy  : running moppy project\n", program);
+	printf(" %s moppy      : running moppy project\n", program);
+	printf(" %s test2      : testing socket in moppy project\n", program);
 }
 
 #ifdef CONFIG_BUILD_KERNEL
@@ -84,8 +85,10 @@ int sensorbd_main(int argc, FAR char *argv[])
 			main_recorder(argc, argv);
 		} else if (strcmp(argv[1], "player") == 0) {
 			main_player(argc, argv);
-		} else if (strcmp(argv[1], "run_moppy") == 0) {
+		} else if (strcmp(argv[1], "moppy") == 0) {
 			main_moppy(argc, argv);
+		} else if (strcmp(argv[1], "test2") == 0) {
+			main_test2(argc, argv);
 		} else {
 			show_usage(argv[0]);
 		}

@@ -38,7 +38,7 @@ static void codec_stop(void)
 void main_player(void)
 {
 	FILE *f;
-	uint8_t vol1 = 30;
+	uint8_t vol1 = 32;
 	f = fopen("/media/0/test1.wav", "rb");
 	if (!f) {
 		perror("fopen()");

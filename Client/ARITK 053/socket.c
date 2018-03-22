@@ -9,10 +9,25 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <netutils/netlib.h>
+
 #define PORT 7001
-//#define IP "112.221.113.29"
-#define IP "192.168.0.10"
+#define IP "112.221.113.29"
 #define BUFF_SIZE 512
+
+/*
+void getmacaddr(void){
+	uint8 tmacId[6];
+
+	netlib_getmacaddr("wl1", macId);
+
+	printf("MAC: %02x:%02x:%02x:%02x:%02x:%02x:\n",
+			((uint8_t *) macId)[0],
+			((uint8_t *) macId)[1],	((uint8_t *) macId)[2],
+			((uint8_t *) macId)[3],	((uint8_t *) macId)[4],
+			((uint8_t *) macId)[5]);
+}
+*/
 
 void main_socket(void)
 {
@@ -61,11 +76,15 @@ void main_socket(void)
 	char size_msg[len_digits];
 	sprintf(size_msg, "%d", file_size);
 
+	// message format
+	//char msg_format1[] = "FS,";	
+
 	// sending file size
-	int sendBytes = 0;
-	sendBytes = send(sock, size_msg, sizeof(size_msg), 0);
+	//strcat(msg_format1, size_msg);
+	send(sock, size_msg, sizeof(size_msg), 0);
 	
 	// sending file
+	int sendBytes = 0;
 	int totalBufferNum = 0;
 	int BufferNum = 0;
 	long totalSendBytes = 0;
