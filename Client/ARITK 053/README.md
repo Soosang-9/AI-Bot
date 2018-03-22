@@ -13,14 +13,16 @@ ARTIK053
                       ├ socket.c
                       ├ recorder.c
                       ├ player.c
-                      └ run_moppy.c
+                      ├ moppy.c
+                      └ test2.c
 ```
             
 ## Show usage
-- socket : audio file send/recv
-- recorder : audio recorder
-- player : audio player
-- run_moppy : running moppy project
+- socket: audio file send/recv
+- recorder: audio recorder
+- player: audio player
+- run_moppy: running moppy project
+- test2: testing socket in moppy project
 
 ## Run 
-- sensorbd run_moppy
+- sensorbd moppy
