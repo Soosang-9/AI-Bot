@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# master project
+# TCP_Error branch
 
 import multiprocessing
 import socket
@@ -87,8 +87,13 @@ class Socket:
                         # ================================================
                         # If select fine old client_socket connection
                         # ================================================
-                        message = sock.recv(BUFSIZE)
-                        if message:
+                        try:
+                            message = sock.recv(BUFSIZE)
+                        except Exception as e:
+                            print('\n\t★ recv error, connection peer >> {}'.format(e))
+                            message = None
+
+                        if message is not None:
                             # print('\tclient_message >> {}'.format(message))
                             # print('\tclient_message_size >> {}'.format(len(message)))
                             # ================================================
@@ -101,8 +106,11 @@ class Socket:
                                 temp_data += message
                                 while True if self.data_length != len(temp_data) else False:
                                     # print('{}'.format(True if self.data_length != len(temp_data) else False))
-                                    temp_data += sock.recv(BUFSIZE)
-                                    # print('{}'.format(len(temp_data))),
+                                    try:
+                                        temp_data += sock.recv(BUFSIZE)
+                                    except Exception as e:
+                                        print('\n\t★ recv error, connection peer >> {}'.format(e))
+                                        # you have to return action state code [ OK / NO ]
 
                                 try:
                                     print('\ntry to make file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
@@ -171,7 +179,8 @@ class Socket:
                                 try:
                                     self.data_length = int(message)
                                 except Exception as e:
-                                    print('\n★ server recv error >> {}'.format(e))
+                                    print('\n★ int casting  error >> {}'.format(e))
+                                    # you have to return to action state code [ OK / NO ]
 
                         else:
                             # ================================================
