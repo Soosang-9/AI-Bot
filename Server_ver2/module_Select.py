@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# TCP_Error branch
+# Master branch
 
 import multiprocessing
 import socket
@@ -7,8 +7,8 @@ import time
 import sys
 import os
 import select
-import aibril_module
-import tts_stt_module
+import module_Aibril
+import module_GoogleTtsStt
 
 HOST = ''
 PORT = 7001
@@ -42,7 +42,7 @@ class SocketProcess(multiprocessing.Process):
 class Socket:
     def __init__(self):
         # self.aibril = aibril_module.Aibril()
-        self.google = tts_stt_module.GoogleTtsStt()
+        self.google = module_GoogleTtsStt.GoogleTtsStt()
         # ================================================
         # Make server_socket and add reuse_address option.
         # ================================================
@@ -72,7 +72,7 @@ class Socket:
                     # ================================================
                     if sock == self.connection_list[0]:
                         client_socket, client_info = self.connection_list[0].accept()
-                        aibril = aibril_module.Aibril()
+                        aibril = module_Aibril.Aibril()
                         self.connection_list.append(client_socket)
                         self.aibril_list.append(aibril)
                         print('\ttime {} >> new client {} connected'.format(time.ctime(), client_info))
@@ -180,7 +180,7 @@ class Socket:
                                     self.data_length = int(message)
                                 except Exception as e:
                                     print('\n★ int casting  error >> {}'.format(e))
-                                    # you have to return to action state code [ OK / NO ]
+                                    # you have to return action state code [ OK / NO ]
 
                         else:
                             # ================================================
