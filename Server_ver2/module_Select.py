@@ -57,6 +57,8 @@ class Socket:
         self.data_length = 0
         self.count = 0
 
+        self.aibril_count = 0
+
     def socket_action(self):
         print('socket_action >> >> >> >> >> >> >>')
         print('\nwaiting client socket connection >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>')
@@ -133,6 +135,7 @@ class Socket:
                                 # print('\taibril_list >> {}'.format(self.aibril_list[sock_index]))
 
                                 try:
+                                    self.aibril_count += 1
                                     text_gtts, language = self.aibril_list[sock_index].response(rec_stt)
                                 except Exception as e:
                                     print('\n\t★ Please set watson values >> {}\n'.format(e))
@@ -173,6 +176,7 @@ class Socket:
 
                                     self.data_length = 0
                                     print('\nprogram send end >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
+                                    print('\n\taibril count >> {}'.format(self.aibril_count))
 
                             else:
                                 print('\tclient_message - now it is data_length>> {}'.format(message))
