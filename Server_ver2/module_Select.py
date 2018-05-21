@@ -143,6 +143,13 @@ class Socket:
                                     print('\n\t★ Please set watson values >> {}\n'.format(e))
                                     text_gtts = None
 
+                                # 에이브릴 종료.
+                                # 콘텐츠~:
+                                # 음악재생코드
+                                # 그거아닐때
+
+
+
                                 if text_gtts is not None:
                                     # --------------------------------------------------
                                     #   text to speech (google)

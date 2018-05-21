@@ -12,8 +12,8 @@ WATSON_USERNAME = os.getenv('watson_username')
 WATSON_PASSWORD = os.getenv('watson_password')
 WATSON_URL = 'https://gateway.aibril-watson.kr/conversation/api'
 WATSON_WORKSPACE = os.getenv('watson_workspace')
-# WATSON_VERSION = '2017-10-26'
-WATSON_VERSION = '2018-02-16'
+WATSON_VERSION = '2017-10-26'
+# WATSON_VERSION = '2018-02-16'
 CONTEXT = {'timezone': 'Asia/Seoul'}
 
 
@@ -37,7 +37,7 @@ class Aibril:
                 url=WATSON_URL
             )
             response = self.conversation.message(workspace_id=WATSON_WORKSPACE,
-                                                 input={'text': ''},
+                                                 message_input={'text': ''},
                                                  context=self.context)
             self.watson_conv_id = response['context']['conversation_id']
             # print('self.watson_conv_id >> {}'.format(self.watson_conv_id))
@@ -59,7 +59,7 @@ class Aibril:
 
         response = self.conversation.message(
             workspace_id=WATSON_WORKSPACE,
-            input={'text': rec_stt},
+            message_input={'text': rec_stt},
             context=self.context
         )
 
