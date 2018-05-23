@@ -13,7 +13,7 @@ import module_GoogleTtsStt
 from utils import media_player
 
 HOST = ''
-PORT = 7001
+PORT = 5555
 BUFSIZE = 1024
 ADDR = (HOST, PORT)
 
@@ -29,14 +29,14 @@ def audio_converter(input_audio):
 class SocketProcess(multiprocessing.Process):
     def __init__(self):
         super(SocketProcess, self).__init__()
-        # print('socket_process >> >> >> >> >> >> >>')
+        print('socket_process >> >> >> >> >> >> >>')
         self.socket_process = None
 
     def run(self):
         # ================================================
         # Make user socket class
         # ================================================
-        # print('run >> >> >> >> >> >>')
+        print('run >> >> >> >> >> >>')
         self.socket_process = Socket()
         self.socket_process.socket_action()
 
@@ -48,7 +48,7 @@ class Socket:
         # ================================================
         # Make server_socket and add reuse_address option.
         # ================================================
-        # print('socket class >> >> >> >> >> >> ')
+        print('socket class >> >> >> >> >> >> ')
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server_socket.bind(ADDR)
@@ -61,14 +61,40 @@ class Socket:
 
         self.aibril_count = 0
 
+    @staticmethod
+    def audio_send(sock, audios):
+        for audio_file in audios:
+            try:
+                print('\ntry to read file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
+
+                with open(audio_file, 'rb') as audio:
+                    data = audio.read()
+                    isSuccess = True
+            except Exception as e:
+                isSuccess = False
+                print('\n\t★ file can\'t open >> {}'.format(e))
+
+            if isSuccess:
+                try:
+                    data_length = len(data)
+                    print('\ntry to send file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
+                    sock.send(str(data_length).encode())
+                    print('\tsocket_send length >> {}'.format(data_length))
+                    sock.send(data)
+                    print('\tsocket_send data >> {}'.format(len(data)))
+                except Exception as e:
+                    print('\n\t★ file can\'t send >> {}'.format(e))
+
+        # sock.send("end".encode())
+
     def socket_action(self):
-        # print('socket_action >> >> >> >> >> >> >>')
-        # print('\nwaiting client socket connection >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>')
+        print('socket_action >> >> >> >> >> >> >>')
+        print('\nwaiting client socket connection >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>')
         while self.connection_list:
             try:
 
                 read_socket, write_socket, error_socket = select.select(self.connection_list, [], [], 5)
-                # print('\tread_socket >> {}\n\twrite_socket >> {}\n\terror_socket >> {}'.format(read_socket, write_socket, error_socket))
+                print('\tread_socket >> {}\n\twrite_socket >> {}\n\terror_socket >> {}'.format(read_socket, write_socket, error_socket))
 
                 for sock in read_socket:
                     # ================================================
@@ -79,15 +105,15 @@ class Socket:
                         aibril = module_Aibril.Aibril()
                         self.connection_list.append(client_socket)
                         self.aibril_list.append(aibril)
-                        # print('\ttime {} >> new client {} connected'.format(time.ctime(), client_info))
+                        print('\ttime {} >> new client {} connected'.format(time.ctime(), client_info))
 
                         if not os.path.exists('usr/'+client_info[0]):
-                            # print('\tmake client directory >> {}'.format(client_info[0]))
+                            print('\tmake client directory >> {}'.format(client_info[0]))
                             os.system('mkdir usr/'+client_info[0])
 
                     else:
                         sock_index = self.connection_list.index(sock)-1
-                        # print('\nclient_old_connect >> >> >> >> >> >> >> >> >> >> >>')
+                        print('\nclient_old_connect >> >> >> >> >> >> >> >> >> >> >>')
                         # ================================================
                         # If select fine old client_socket connection
                         # ================================================
@@ -98,18 +124,18 @@ class Socket:
                             message = None
 
                         if message is not None:
-                            # print('\tclient_message >> {}'.format(message))
-                            # print('\tclient_message_size >> {}'.format(len(message)))
+                            print('\tclient_message >> {}'.format(message))
+                            print('\tclient_message_size >> {}'.format(len(message)))
                             # ================================================
                             # If client_socket send data
                             # ================================================
 
                             if self.data_length > 1:
-                                # print('\tself.data_length >> {}'.format(self.data_length))
+                                print('\tself.data_length >> {}'.format(self.data_length))
                                 temp_data = b''
                                 temp_data += message
                                 while True if self.data_length != len(temp_data) else False:
-                                    # print('{}'.format(True if self.data_length != len(temp_data) else False))
+                                    print('{}'.format(True if self.data_length != len(temp_data) else False))
                                     try:
                                         temp_data += sock.recv(BUFSIZE)
                                     except Exception as e:
@@ -117,7 +143,7 @@ class Socket:
                                         # you have to return action state code [ OK / NO ]
 
                                 try:
-                                    # print('\ntry to make file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
+                                    print('\ntry to make file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
                                     file_name = 'usr/' + sock.getpeername()[0] + '/test_file' + str(self.count) + '.wav'
                                     with open(file_name, 'wb') as test_file:
                                         test_file.write(temp_data)
@@ -128,78 +154,69 @@ class Socket:
                                 #   speech to text (google)
                                 # --------------------------------------------------
                                 rec_stt = self.google.stt(file_name)
-                                # print('\trec_stt >> {}'.format(rec_stt))
+                                print('\trec_stt >> {}'.format(rec_stt))
 
                                 # --------------------------------------------------
                                 #   conversation (aibril, watson)
                                 # --------------------------------------------------
-                                # print('\tsock_index >> {}'.format(sock_index))
-                                # print('\taibril_list >> {}'.format(self.aibril_list[sock_index]))
+                                print('\tsock_index >> {}'.format(sock_index))
+                                print('\taibril_list >> {}'.format(self.aibril_list[sock_index]))
 
                                 try:
                                     self.aibril_count += 1
-                                    text_gtts, language = self.aibril_list[sock_index].response(rec_stt)
+                                    header, text_gtts, language = self.aibril_list[sock_index].response(rec_stt)
                                 except Exception as e:
                                     print('\n\t★ Please set watson values >> {}\n'.format(e))
                                     text_gtts = None
 
-                                # 에이브릴 종료.
-                                # 콘텐츠~:
-                                # 음악재생코드
-                                # 그거아닐때
-
-
-
                                 if text_gtts is not None:
-                                    # --------------------------------------------------
-                                    #   text to speech (google)
-                                    # --------------------------------------------------
-                                    # print('\ttext_gtts >> {}'.format(text_gtts))
-                                    file_name = 'usr/' + sock.getpeername()[0] + '/output_tts.'
-                                    self.google.tts(text_gtts, language, (file_name + 'mp3'))
+                                    audio = []
+                                    if header["command"] == "chat":
 
-                                    # --------------------------------------------------
-                                    #   convert audio
-                                    # --------------------------------------------------
-                                    convert_audio = audio_converter(file_name)
+                                        #   << text to speech (google) >>
+                                        file_name = 'usr/' + sock.getpeername()[0] + '/output_tts.'
+                                        self.google.tts(text_gtts, language, (file_name + 'mp3'))
+                                        # --------------------------------------------------
+                                        #   << convert audio >>
+                                        audio.append(audio_converter(file_name))
+                                        # --------------------------------------------------
+                                        #   << read_send >>
+                                        self.audio_send(sock, audio)
 
-                                    self.count += 1
-                                    server_data = None
-                                    server_data_length = None
-                                    try:
-                                        # print('\ntry to read file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
-                                        with open(convert_audio, 'rb') as server_test_file:
-                                            server_data = server_test_file.read()
-                                            server_data_length = len(server_data)
-                                    except Exception as e:
-                                        print('\n\t★ file can\'t open >> {}'.format(e))
+                                    elif header["command"] == "music":
+                                        print('\t!@# music command')
+                                        #   << text to speech (google) >>
+                                        file_name = 'usr/' + sock.getpeername()[0] + '/output_tts.'
+                                        self.google.tts(text_gtts, language, (file_name + 'mp3'))
+                                        # --------------------------------------------------
+                                        #   << convert audio >>
+                                        audio.append(audio_converter(file_name))
+                                        # --------------------------------------------------
+                                        #   << media file choice >>
+                                        audio.append(media_player.media_player(header["genre"]))
+                                        if audio[-1][-3:] == "mp3":
+                                            audio[-1] = audio_converter(audio[-1])
+                                        # --------------------------------------------------
+                                        #   << read_send >>
+                                        self.audio_send(sock, audio)
 
-                                    try:
-                                        # print('\ntry to send file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
-                                        sock.send(str(server_data_length).encode())
-                                        # print('\tsocket_send length >> {}'.format(server_data_length))
-                                        sock.send(server_data)
-                                        # print('\tsocket_send data >> {}'.format(len(server_data)))
-                                    except Exception as e:
-                                        print('\n\t★ file can\'t send >> {}'.format(e))
+                                    elif header["command"] == "weather":
+                                        print("\t!@# weather command")
 
                                     self.data_length = 0
-                                    # print('\nprogram send end >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
-                                    # print('\n\taibril count >> {}'.format(self.aibril_count))
-
-                            else:
-                                # print('\tclient_message - now it is data_length>> {}'.format(message))
-                                try:
-                                    self.data_length = int(message)
-                                except Exception as e:
-                                    print('\n★ int casting  error >> {}'.format(e))
-                                    # you have to return action state code [ OK / NO ]
+                                else:
+                                    print('\tclient_message - now it is data_length>> {}'.format(message))
+                                    try:
+                                        self.data_length = int(message)
+                                    except Exception as e:
+                                        print('\n★ int casting  error >> {}'.format(e))
+                                        # you have to return action state code [ OK / NO ]
 
                         else:
                             # ================================================
                             # If client_socket didn't send message or broken socket
                             # ================================================
-                            # print('\n\t★ client {} disconnected'.format(sock))
+                            print('\n\t★ client {} disconnected'.format(sock))
                             self.connection_list.remove(sock)
                             sock.close()
 

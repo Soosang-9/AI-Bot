@@ -29,7 +29,6 @@ class Aibril:
 
     def connection(self):
         try:
-            print('\n\nconnection')
             self.conversation = conversation_v1.ConversationV1(
                 username=WATSON_USERNAME,
                 password=WATSON_PASSWORD,
@@ -65,16 +64,25 @@ class Aibril:
 
         json_response = json.dumps(response, indent=2, ensure_ascii=False)
         dict_response = json.loads(json_response)
-        print('\njson_response >> {}'.format(json_response))
+        # print('\njson_response >> {}'.format(json_response))
 
         try:
             # --------------------------------------------------
             #   << parsing response >>
 
             result_conv = dict_response['output']['text'][0]
+
+            try:
+                header = dict_response['output']['header']
+                print('header type {}'.format(type(header)))
+            except Exception as e:
+                header = {"command": "chat"}
+                print("It dosen't have Header >> {}".format(e))
+
             # check this action
-            if len(dict_response['output']['text']) > 1:
-                result_conv += " " + dict_response['output']['text'][1]
+            # 다음 문장 추가해서 읽는 것 같은데, 이건 왜 하는 건가?
+            # if len(dict_response['output']['text']) > 1:
+            #     result_conv += " " + dict_response['output']['text'][1]
 
             # --------------------------------------------------
             #   << update context >>
@@ -89,14 +97,13 @@ class Aibril:
                 conv_flag = True
             else:
                 conv_flag = False
-
             # --------------------------------------------------
             #   << Check Translate >>
             try:
                 language = (result_conv.split())[-1]
-                print('la >> {}'.format(language))
             except Exception as e:
                 language = 'trans_ko'
+                print("It dosen't have Text >> {}".format(e))
 
             if language == 'trans_en':
                 language = 'en'
@@ -112,14 +119,15 @@ class Aibril:
             result_conv = "다시 한번 말씀해주세요."
             # --------------------------------------------------
 
-        return result_conv, language
+        return header, result_conv, language
+
 
 if __name__ == "__main__":
     aibril = Aibril()
     text = '안녕'
     while True:
-        text, lan = aibril.response(text)
-        print('text >> {}\nlen >> {}'.format(text, lan))
+        header, text, language = aibril.response(text)
+        print('header >> {}\ntext >> {}\nlanguage >> {}'.format(header, text, language))
         text = input('\n\t 입력 >> ')
         if text == '종료':
             break
