@@ -64,7 +64,7 @@ class Aibril:
 
         json_response = json.dumps(response, indent=2, ensure_ascii=False)
         dict_response = json.loads(json_response)
-        # print('\njson_response >> {}'.format(json_response))
+        print('\njson_response >> {}'.format(json_response))
 
         try:
             # --------------------------------------------------
