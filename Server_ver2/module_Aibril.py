@@ -58,13 +58,15 @@ class Aibril:
 
         response = self.conversation.message(
             workspace_id=WATSON_WORKSPACE,
-            message_input={'text': rec_stt},
+            message_input={
+                   'text': rec_stt
+            },
             context=self.context
         )
 
         json_response = json.dumps(response, indent=2, ensure_ascii=False)
         dict_response = json.loads(json_response)
-        print('\njson_response >> {}'.format(json_response))
+        # print('\njson_response >> {}'.format(json_response))
 
         try:
             # --------------------------------------------------
@@ -74,10 +76,10 @@ class Aibril:
 
             try:
                 header = dict_response['output']['header']
-                print('header type {}'.format(type(header)))
+                # print('header type {}'.format(type(header)))
             except Exception as e:
                 header = {"command": "chat"}
-                print("It dosen't have Header >> {}".format(e))
+                # print("It dosen't have Header >> {}".format(e))
 
             # check this action
             # 다음 문장 추가해서 읽는 것 같은데, 이건 왜 하는 건가?
@@ -88,7 +90,13 @@ class Aibril:
             #   << update context >>
 
             self.context.update(dict_response['context'])
+            # context 안에 변수 넣어서 에이브릴에서 사용하게 할 수 있음.
+            # 딕셔너리 value 안에 리스트 혹은 딕셔너리로 사용.
+            # 사용 후에 value 삭제 후  update.
+
             # print('\n\nself.context.update >> {}'.format(self.context))
+            # print("typetypetype>> {}".format(type(self.context)))
+            # self.context['value'] = {'aa':"1", "bb":'2"'}
 
             # --------------------------------------------------
             #  <<  Check conversation is end or durable >>
