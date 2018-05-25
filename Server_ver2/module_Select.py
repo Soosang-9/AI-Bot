@@ -43,7 +43,6 @@ def pcm2wav(path):
     ff.run()
 
 
-
 class SocketProcess(multiprocessing.Process):
     def __init__(self):
         super(SocketProcess, self).__init__()
@@ -79,32 +78,6 @@ class Socket:
         self.count = 0
 
         self.aibril_count = 0
-
-    # @staticmethod
-    # def audio_send(sock, audios):
-    #     for audio_file in audios:
-    #         try:
-    #             print('\ntry to read file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
-    #
-    #             with open(audio_file, 'rb') as audio:
-    #                 data = audio.read()
-    #                 isSuccess = True
-    #         except Exception as e:
-    #             isSuccess = False
-    #             print('\n\t★ file can\'t open >> {}'.format(e))
-    #
-    #         if isSuccess:
-    #             try:
-    #                 data_length = len(data)
-    #                 print('\ntry to send file >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>\n')
-    #                 sock.send(str(data_length).encode())
-    #                 print('\tsocket_send length >> {}'.format(data_length))
-    #                 sock.send(data)
-    #                 print('\tsocket_send data >> {}'.format(len(data)))
-    #             except Exception as e:
-    #                 print('\n\t★ file can\'t send >> {}'.format(e))
-
-        # sock.send("end".encode())
 
     def socket_action(self):
         print('\nwaiting client socket connection >> >> >> >> >> >> >> >> >> >> >> >> >> >> >> >>')
