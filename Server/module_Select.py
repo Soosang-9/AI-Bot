@@ -39,7 +39,6 @@ def pcm2wav(path):
     ff = FFmpeg(
             inputs={path: ['-f', 's16le', '-ar', '16000', '-ac', '2']},
             outputs={''.join([path, '.wav']): '-y'})
-            # outputs={path: '-y'})
     ff.run()
 
 
@@ -74,9 +73,10 @@ class Socket:
 
         self.connection_list = [server_socket]
         self.aibril_list = []
-        self.data_length = 0
-        self.count = 0
+        # self.data_length = 0
 
+        # count value, 지워도 됨
+        self.count = 0
         self.aibril_count = 0
 
     def socket_action(self):
@@ -155,7 +155,7 @@ class Socket:
 
                                 #   << text to speech (google) >>
                                 file_name = 'usr/' + sock.getpeername()[0] + '/output_tts.mp3'
-                                self.google.tts(text_gtts, language, (file_name))
+                                self.google.tts(text_gtts, language, file_name)
                                 # --------------------------------------------------
                                 #   << convert audio >>
                                 audio = audio_converter(file_name)
@@ -203,6 +203,7 @@ class Socket:
                             sock.close()
                             self.count += 1
 
+                        # 위치 수정 해야함, 왜 여기 와있음?
                         else:
                             # ================================================
                             # If client_socket didn't send message or broken socket
