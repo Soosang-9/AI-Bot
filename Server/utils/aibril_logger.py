@@ -18,7 +18,7 @@ class logger:
         self.logger.addHandler(self.streamHandler)
 
     def write_info(self, text):
-        self.logger.info(text)
+        self.logger.info(text)\
 
     def write_warning(self, text):
         self.logger.warning(text)
