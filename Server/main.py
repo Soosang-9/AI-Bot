@@ -2,7 +2,6 @@
 
 import module_Select
 
-
 class MainProcess:
     def __init__(self):
         tcp_server = module_Select.SocketProcess()
