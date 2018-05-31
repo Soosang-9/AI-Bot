@@ -2,5 +2,5 @@ ffmpy
 watson-developer-cloud==0.26.1
 SpeechRecognition==3.8.1
 gTTS==1.2.2
-boto3
-awscli
+#boto3
+#awscli
