@@ -1,11 +1,11 @@
 # master project
 
-import tcp_socket
+import module_Select
 
 
 class MainProcess:
     def __init__(self):
-        tcp_server = tcp_socket.SocketProcess()
+        tcp_server = module_Select.SocketProcess()
         # tcp_server.daemon = True
         tcp_server.start()
 
