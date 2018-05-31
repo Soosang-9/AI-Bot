@@ -1,6 +1,3 @@
-# made by Leni ♡
-
-
 import multiprocessing
 import select
 
