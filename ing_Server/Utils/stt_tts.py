@@ -18,6 +18,7 @@ class SpeechToText:
                 self.result_audio_stt = r.recognize_google(audio, show_all=False, language='ko_KR')
             except Exception as e:
                 print(e)
+        print("Success Google STT")
 
         return self.output_stt
 
