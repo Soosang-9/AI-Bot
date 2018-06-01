@@ -3,6 +3,7 @@
 class Communication:
     def __init__(self):
         self.sock = None
+        self.count = 0
 
     def setting_sock(self, sock):
         self.sock = sock
@@ -19,13 +20,13 @@ class Communication:
                     if len(data) == 0:
                         break
                     else:
-                        count += 1
-                        print('\t- data len >> ', len(data))
-                        print('\t- data count >> ', count)
                         if not self.sending(data):
                             break
 
     def sending(self, data):
+            self.count += 1
+            print('\t- data len >> ', len(data))
+            print('\t- data count >> ', self.count)
             self.sock.send(data)
             answer = self.sock.recv(1024)
             print('here_re_answer > {}'.format(answer))

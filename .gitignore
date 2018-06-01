@@ -16,3 +16,5 @@ ing_Server/env/
 Server/__pycache__/
 
 Server/utils/__pycache__/
+
+Server/usr/

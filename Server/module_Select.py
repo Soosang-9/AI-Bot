@@ -96,22 +96,22 @@ class Socket:
                         client_socket, client_info = self.connection_list[0].accept()
                         aibril = module_Aibril.Aibril()
                         self.connection_list.append(client_socket)
-                        self.aibril_list.append(aibril)
+                        # self.aibril_list.append(aibril)
                         print('\ttime {} >> new client {} connected'.format(time.ctime(), client_info))
 
                         if not os.path.exists('usr/'+client_info[0]):
                             print('\tmake client directory >> {}'.format(client_info[0]))
                             os.system('mkdir usr/'+client_info[0])
 
-                    else:
-                        file = 'usr/' + sock.getpeername()[0] + '/output_tts.mp3'
+                        file = 'usr/' + client_socket.getpeername()[0] + '/output_tts.wav'
+                        print("file open")
                         with open(file, 'rb') as f:
                             data = f.read()
-                        print("size >> {}".format(data.__sizeof__()))
-                        sock.send(data.__sizeof__())
-                        a=sock.recv(1024)
+                        print("size >> {}".format(len(data)))
+                        client_socket.send(str(len(data)).encode())
+                        a=client_socket.recv(1024)
                         print("recv{}".format(a))
-                        self.communi.sending_wav(sock, file)
+                        self.communi.sending_wav(client_socket, file)
                         # sock_index = self.connection_list.index(sock)-1
                         # print('\nclient_old_connect >> >> >> >> >> >> >> >> >> >> >>')
                         # # ================================================
