@@ -28,7 +28,6 @@ class Socket:
         self.connection_list = []
         # 소켓 정의 및 커넥션 하는 함수 호출
         # 소켓 생성 후 리턴해서 self.connection_list 에 넣어주어야 한다.
-        pass
 
     def handler(self):
         while self.connection_list:
