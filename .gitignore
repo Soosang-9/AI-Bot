@@ -12,3 +12,7 @@ oneport_streaming/SERVER_oneport_streaming/utils/
 \.DS_Store
 
 ing_Server/env/
+
+Server/__pycache__/
+
+Server/utils/__pycache__/
